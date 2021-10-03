@@ -16,32 +16,32 @@ const Elem& Deque::back(){
 }
 
 // Return the number of items in the deque
-int Deque::size()const{
+int Deque::size() const{
     return n;
 }
 
 // Insert a new element at the beginning of the deque
-void Deque::insertFront(const Elem& e){
-    DList.addFront(e);
+void Deque::insertFront(const Elem& element){
+    DList.addFront(element);
     n++;
 }
 
 // Insert a new element at the end of the deque
-void Deque::insertBack(const Elem& e){
-    DList.addBack(e);
+void Deque::insertBack(const Elem& element){
+    DList.addBack(element);
     n++;
 }
 
 // Remove the first element of the deque
-void Deque::eraseFront() throw(DequeEmpty){
-    if(isEmpty()){ throw DequeEmpty("Empty deque");}
-    DList.eraseFront();
+void Deque::removeFront(){
+    if(isEmpty()){ throw("Empty deque");}
+    DList.removeFront();
     n--;
 }
 
 // Remove the last element of the deque
-void Deque::eraseBack(){
-    if(isEmpty()){ throw DequeEmpty("Empty deque");}
-    DList.eraseBack();
+void Deque::removeBack(){
+    if(isEmpty()){ throw("Empty deque");}
+    DList.removeBack();
     n--;
 }

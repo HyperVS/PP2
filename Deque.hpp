@@ -10,10 +10,10 @@ public:
     const Elem& front(); // Return first element of the deque
     const Elem& back(); // Return last element of the deque
 
-    void insertFront(const Elem& e); // Insert new first element
-    void insertBack(const Elem& e); // Insert new last element
-    void eraseFront(); // Remove first element
-    void eraseBack(); // Remove last element
+    void insertFront(const Elem& element); // Insert new first element
+    void insertBack(const Elem& element); // Insert new last element
+    void removeFront(); // Remove first element
+    void removeBack(); // Remove last element
 private:
     DLinkedList DList; // Doubly linked list of elements
     int n = 0; // Count for the number of elements in the deque

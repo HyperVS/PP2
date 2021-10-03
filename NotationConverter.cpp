@@ -31,7 +31,7 @@ std::string NotationConverter::postfixToInfix(std::string inStr){
     // Retrieve operands and operators from the temporary deques and insert them into the main deque
     while(!operands.isEmpty()){
         deque.insertBack(operands.front());
-        operands.eraseFront();
+        operands.removeFront();
 
         // Remaining operators if any get put into the main deque
         if(!operators.isEmpty()){
@@ -40,12 +40,12 @@ std::string NotationConverter::postfixToInfix(std::string inStr){
             if(operators.size() == 2){
                 deque.insertBack(')');
                 deque.insertBack(operators.back());
-                operators.eraseBack();
+                operators.removeBack();
                 deque.insertBack('(');
             }
             else{
                 deque.insertBack(operators.front());
-                operators.eraseFront();
+                operators.removeFront();
             }
         }
     }
@@ -93,11 +93,11 @@ std::string NotationConverter::infixToPostfix(std::string inStr){
             // Insert from the back of the operators deque if there are 2 operators left
             if(operators.size() == 2){
                 deque.insertBack(operators.back());
-                operators.eraseBack();
+                operators.removeBack();
             }
             else{
                 deque.insertBack(operators.front());
-                operators.eraseFront();
+                operators.removeFront();
             }
         }
     }
@@ -126,7 +126,6 @@ std::string NotationConverter::infixToPrefix(std::string inStr){
 
                     // Else insert to the back of the main deque
                     else deque.insertBack(inStr[i]);
-                    
                 }
 
                 // Insert the operands into the temporary operands deque
@@ -139,7 +138,7 @@ std::string NotationConverter::infixToPrefix(std::string inStr){
         int count = operands.size();
         for(int i=0; i<count; ++i){
             deque.insertBack(operands.front());
-            operands.eraseFront();
+            operands.removeFront();
         }
     }
 
@@ -182,7 +181,7 @@ std::string NotationConverter::prefixToInfix(std::string inStr){
                 // Insert the operator from the operands deque into the main deque
                 if(operators.isEmpty() == false){
                     deque.insertBack(operators.back());
-                    operators.eraseBack();
+                    operators.removeBack();
                     needParenthesis = true; // Parenthesis is now needed in the next iteration of the loop
                 }
             }
@@ -216,11 +215,11 @@ std::string NotationConverter::toString(){
     int size = deque.size();
 
     // Fix formatting as instructed
-    for(int i=0; i<size; ++i){
+    for(unsigned int i=0; i<size; ++i){
         if(deque.front() == ')') outStr.pop_back();
         outStr += deque.front();
         if(deque.front() != '(') outStr += ' ';
-        deque.eraseFront();
+        deque.removeFront();
     }
 
     // Remove extra space
