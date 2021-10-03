@@ -1,47 +1,22 @@
 #ifndef DEQUE_H
 #define DEQUE_H
+#include "DLinkedList.hpp"
 
-class Node{
-    private:
-    char str;
-    Node* prev;
-    Node* next;
-friend class LinkedList;
-};
-
-class LinkedList{
-public:
-    LinkedList();
-    ~LinkedList();
-    bool empty() const;
-    const char& front() const;
-    const char& back() const;
-    void addFront(const char& e);
-    void addBack(const char& e);
-    void removeFront();
-    void removeBack();
-private:
-    Node* header;
-    Node* trailer;
-protected:
-    void add(Node* v, const char& e);
-    void remove (Node* v);
-};
-
+// Class of a linked deque
 class Deque{
 public:
-    int size() const;
-    bool empty() const;
-    const char& front();
-    const char& back();
+    int size() const; // Return number of elements in the deque
+    bool isEmpty() const; // Check if the deque is empty or not
+    const Elem& front(); // Return first element of the deque
+    const Elem& back(); // Return last element of the deque
 
-    void insertFront(const char& e);
-    void insertBack(const char& e);
-    void removeFront();
-    void removeBack();
+    void insertFront(const Elem& e); // Insert new first element
+    void insertBack(const Elem& e); // Insert new last element
+    void eraseFront(); // Remove first element
+    void eraseBack(); // Remove last element
 private:
-    LinkedList D;
-    int n = 0;
+    DLinkedList DList; // Doubly linked list of elements
+    int n = 0; // Count for the number of elements in the deque
 friend class NotationConverter;
 };
 

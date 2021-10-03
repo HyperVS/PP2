@@ -1,240 +1,231 @@
 #include "NotationConverter.hpp"
-using namespace std;
 
-//postfixToInfix takes in a postfix string and converts it to infix
-string NotationConverter::postfixToInfix(string inStr){
-    if(!isalpha(inStr[0]))
-        throw inStr;
+// Takes a string of postfix notation and returns a std::string in infix notation
+std::string NotationConverter::postfixToInfix(std::string inStr){
 
-    for(unsigned int i = 0; i < inStr.size(); i++){
-        //This if statement removes whitespace from the string
-        if(inStr[i] != ' '){
-            //This if statement inserts the operator into a temporary deque
-            if(inStr[i] == '+' || inStr[i] == '-' || inStr[i] == '*' || inStr[i] == '/')
-                temp2.insertBack(inStr[i]);
-            //This else statement inserts the operand into another temporary deque
-            else
-                temp.insertBack(inStr[i]);
+    // Validate input is postfix
+    if(!isalpha(inStr[0])) throw inStr;
+
+    for(unsigned int i=0; i<inStr.size(); ++i){
+        
+        // Remove all white spaces
+        if(inStr[i] != ' '){ 
+
+            // Store operators in the temporary operators deque
+            if(inStr[i] == '+' || inStr[i] == '-' || inStr[i] == '*' || inStr[i] == '/') operators.insertBack(inStr[i]);
+
+            // Store operands in the temporary operands deque
+            else operands.insertBack(inStr[i]);
         }
     }
 
-    //Checks if postfix is correct
-    if(temp2.size() != temp.size()-1){
-        throw inStr;
-    }
+    // Validate postfix is correct
+    if(operators.size() != operands.size()-1) throw inStr;
     
-    N.insertBack('(');
+    deque.insertBack('(');
+    int count = operators.size();
+    
+    // Insert parenthesis depending on operator count
+    for(int i=1; i<count-1; ++i) deque.insertBack('(');
 
-    //The variable num is used since the size of temp2 will be changing
-    int num = temp2.size();
-    //The amount of parentheses being inserted depend on the amount of operators
-    for(int i = 1; i < num-1; i++)
-            N.insertBack('(');
+    // Retrieve operands and operators from the temporary deques and insert them into the main deque
+    while(!operands.isEmpty()){
+        deque.insertBack(operands.front());
+        operands.eraseFront();
 
-    //This loop inserts the operand and operators from their temporary deques
-    while(temp.empty() == false){
-        N.insertBack(temp.front());
-        temp.removeFront();
-
-        //If there are still operators in the temp deque, then insert them into the main deque
-        if(temp2.empty() == false){
-            //If there are 2 operators left, then this removes the one from the back instead of the front
-            //This is to maintain proper infix order
-            if(temp2.size() == 2){
-                N.insertBack(')');
-                N.insertBack(temp2.back());
-                temp2.removeBack();
-                N.insertBack('(');
+        // Remaining operators if any get put into the main deque
+        if(!operators.isEmpty()){
+            
+            // Insert from the back of the operators deque if there are 2 operators left
+            if(operators.size() == 2){
+                deque.insertBack(')');
+                deque.insertBack(operators.back());
+                operators.eraseBack();
+                deque.insertBack('(');
             }
             else{
-                N.insertBack(temp2.front());
-                temp2.removeFront();
+                deque.insertBack(operators.front());
+                operators.eraseFront();
             }
         }
     }
 
-    N.insertBack(')');
+    deque.insertBack(')');
 
-    //Inserts any remaining parentheses needed
-    for(int i = 1; i < num-1; i++)
-            N.insertBack(')');
+    // Insert remaining parenthesis needed to make the infix notation correct
+    for(int i=1; i<count-1; ++i) deque.insertBack(')');
 
+    // Return elements in the main deque as a single string
     return toString();
 }
 
-//postfixToPrefix takes an postfix string and converts it to a prefix string
-//It uses other functions to convert to infix first and then finally to prefix
-string NotationConverter::postfixToPrefix(string inStr){
+// Takes a string of postfix notation and returns a string in prefix notation
+std::string NotationConverter::postfixToPrefix(std::string inStr){
     return infixToPrefix(postfixToInfix(inStr));
 }
 
-//infixToPostfix takes an infix string and converts it to postfix
-string NotationConverter::infixToPostfix(string inStr){
-    if(inStr[0] != '('){
-        throw inStr;
-    }
+// Takes a string of infix notation and returns a string in postfix notation
+std::string NotationConverter::infixToPostfix(std::string inStr){
+
+    // Validate input is infix
+    if(inStr[0] != '(') throw inStr;
     
-    for(unsigned int i = 0; i < inStr.size(); i++){
-        //The while loop removes any left parentheses
-        //One of the test cases had a space after the end parenthesis that caused problems
-        //So I had to make sure that it does not iterate past the end of the string
+    for(unsigned int i=0; i<inStr.size(); ++i){
+        
+        // Remove parenthesis from the infix notation
         while(inStr[i] != ')' && inStr[i] != *inStr.end()){
             if(inStr[i] != ' '){
-                //Inserts operators into a temporary deque
+
+                // Store operators in the temporary deque
                 if(inStr[i] == '+' || inStr[i] == '-' || inStr[i] == '*' || inStr[i] == '/'){
-                        temp.insertBack(inStr[i]);
+                    operators.insertBack(inStr[i]);
                 }
-                //Inserts the operands into the main deque
-                else if(inStr[i] != '('){
-                    N.insertBack(inStr[i]);
-                }
+                
+                // Store operands in the main deque
+                else if(inStr[i] != '(') deque.insertBack(inStr[i]);
             }
             i++;
         }
 
-        int num = temp.size();
-        for(int i = 0; i < num; i++){
-            //If there are 2 operators in the temp deque, then it removes the back to maintain postfix order
-            if(temp.size() == 2){
-                N.insertBack(temp.back());
-                temp.removeBack();
+        int count = operators.size();
+        for(int i = 0; i < count; i++){
+    
+            // Insert from the back of the operators deque if there are 2 operators left
+            if(operators.size() == 2){
+                deque.insertBack(operators.back());
+                operators.eraseBack();
             }
             else{
-                N.insertBack(temp.front());
-                temp.removeFront();
+                deque.insertBack(operators.front());
+                operators.eraseFront();
             }
         }
     }
+
+    // Return elements in the main deque as a single string
     return toString();
 }
 
-//infixToPrefix takes an infix string and converts it to prefix
-string NotationConverter::infixToPrefix(string inStr){
-    if(inStr[0] != '('){
-        throw inStr;
-    }
-    for(unsigned int i = 0; i < inStr.size(); i++){
-        //The while loop removes any left parentheses
-        //One of the test cases had a space after the end parenthesis that caused problems
-        //So I had to make sure that it does not iterate past the end of the string 
+// Takes a string of infix notation and returns a std::string in prefix notation
+std::string NotationConverter::infixToPrefix(std::string inStr){
+
+    // Validate input is infix
+    if(inStr[0] != '(') throw inStr;
+
+    for(unsigned int i=0; i<inStr.size(); ++i){
+
+        // Remove parenthesis from the infix notation
         while(inStr[i] != ')' && inStr[i] != *inStr.end()){
             if(inStr[i] != ' '){
                 if(inStr[i] == '+' || inStr[i] == '-' || inStr[i] == '*' || inStr[i] == '/'){
-                    //If the operator was next to a left parenthesis, then insert it to the front
-                    //This is for prefix ordering
+
+                    // Insert the operator to the front of the main deque if it is next to parenthesis
                     if(inStr[i-2] == ')'){
-                        N.insertFront(inStr[i]);
+                        deque.insertFront(inStr[i]);
                     }
-                    //Else insert it to the back like normal
-                    else{
-                        N.insertBack(inStr[i]);
-                    }
+
+                    // Else insert to the back of the main deque
+                    else deque.insertBack(inStr[i]);
+                    
                 }
-                //Inserts the operands into the temporary deque
-                else if(inStr[i] != '('){
-                    temp.insertBack(inStr[i]);
-                }
+
+                // Insert the operands into the temporary operands deque
+                else if(inStr[i] != '(') operands.insertBack(inStr[i]);
             }
             i++;
         }
 
-        //This section inserts the operands from the temp deque into the main one
-        int num = temp.size();
-        for(int i = 0; i < num; i++){
-            N.insertBack(temp.front());
-            temp.removeFront();
+        // Insert operands from the operands deque into the main deque
+        int count = operands.size();
+        for(int i=0; i<count; ++i){
+            deque.insertBack(operands.front());
+            operands.eraseFront();
         }
     }
+
+    // Return elements in the main deque as a single string
     return toString();
 }
 
-//prefixToInfix converts a prefix string to infix 
-string NotationConverter::prefixToInfix(string inStr){
-    if(inStr[0] != '+' && inStr[0] != '-' && inStr[0] != '*' && inStr[0] != '/')
-        throw inStr;
+// Takes a string of prefix notation and returns a string in infix notation
+std::string NotationConverter::prefixToInfix(std::string inStr){
 
-    bool needP = false; //variable to determine if a left parenthesis is needed
-    int par = 0;        //variable to make sure that there are an even amount of parentheses
+    // Vaidate input is prefix
+    if(inStr[0] != '+' && inStr[0] != '-' && inStr[0] != '*' && inStr[0] != '/') throw inStr;
 
-    for(unsigned int i = 0; i < inStr.size(); i++){
+    // Determine if parenthesis are needed and store count to make sure there is an even amount
+    bool needParenthesis = false;
+    int parCount= 0;
+
+    for(unsigned int i=0; i<inStr.size(); ++i){
         if(inStr[i] != ' '){
-            //Inserts operators into temp deque
+
+            // Insert operators into operators deque
             if(inStr[i] == '+' || inStr[i] == '-' || inStr[i] == '*' || inStr[i] == '/'){
-                temp.insertBack(inStr[i]);
-                N.insertBack('(');
-                par++;
-                needP = false;  //Left parenthesis is not needed until an operand is found
+                operators.insertBack(inStr[i]);
+                deque.insertBack('(');
+                parCount++;
+                needParenthesis = false; // No operand found yet
             }
+
             else{
-                //Inserts operand into main deque
-                N.insertBack(inStr[i]);
 
-                //Inserts a left parenthesis after an operand, operator, and then operand are inserted
-                if(needP == true){
-                    N.insertBack(')');
-                    par--;
+                // Insert operands into main deque
+                deque.insertBack(inStr[i]);
+
+                // Insert a parenthesis after an operator in between two operands is inserted
+                if(needParenthesis == true){
+                    deque.insertBack(')');
+                    parCount--; // Decrement count each time a closing parenthesis is inserted to keep at 0
                 }
 
-                //Inserts the operator from the temp deque into the main deque
-                if(temp.empty() == false){
-                    N.insertBack(temp.back());
-                    temp.removeBack();
-                    needP = true;   //Left parenthesis is needed in the next loop
+                // Insert the operator from the operands deque into the main deque
+                if(operators.isEmpty() == false){
+                    deque.insertBack(operators.back());
+                    operators.eraseBack();
+                    needParenthesis = true; // Parenthesis is now needed in the next iteration of the loop
                 }
             }
         }
     }
 
-    //If par is 0, then there are an even number of parentheses
-    //If not, then just one more left parenthesis is needed
-    if(par != 0){
-        while(par != 0){
-            N.insertBack(')');
-            par--;
+    // Check if there are a correct amount of opening and closing parenthesis and fix as needed
+    if(parCount != 0){
+        while(parCount != 0){
+            deque.insertBack(')');
+            parCount--;
         }
     }
 
+    // Return elements in the main deque as a single string
     return toString();
 }
 
-//prefixToPostfix converts a prefix string to postfix
-//It uses other functions to first convert to infix and then postfix
-string NotationConverter::prefixToPostfix(string inStr){
+// Takes a string of prefix notation and returns a string in postfix notation
+std::string NotationConverter::prefixToPostfix(std::string inStr){
     return infixToPostfix(prefixToInfix(inStr));
 }
 
-//toString removes elements from the deque and converts them into a single string
-//It is used by all the other functions
-//It does not take any arguments since the deque is part of the class
-string NotationConverter::toString(){
-    string newstr;
+// Converts elements in the deque into a single string to be returned
+std::string NotationConverter::toString(){
+    std::string outStr;
 
-    //Checks if the deque is empty
-    if(N.empty() == true)
-        return newstr;
+    // Checks if the deque is empty
+    if(deque.isEmpty()) return outStr;
 
-    int size = N.size();    //Needed since N will be changing sizes
+    int size = deque.size();
 
-    for(int i = 0; i < size; i++)
-    {
-        //If the character being inserted is a left parenthesis,
-        //then this removes whitespace from the end of the string to make sure
-        //that there is not space between the operand and the parenthesis
-        if(N.front() == ')'){
-            newstr.pop_back();
-        }
-
-        newstr += N.front();
-
-        //Makes sure to not put space in front of the right parenthesis
-        if(N.front() != '(')
-            newstr += ' ';
-
-        N.removeFront();
+    // Fix formatting as instructed
+    for(int i=0; i<size; ++i){
+        if(deque.front() == ')') outStr.pop_back();
+        outStr += deque.front();
+        if(deque.front() != '(') outStr += ' ';
+        deque.eraseFront();
     }
 
-    //An extra space is always added at the end of the loop, so this removes it
-    newstr.pop_back();
+    // Remove extra space
+    outStr.pop_back();
 
-    return newstr;
+    // Return the string
+    return outStr;
 }

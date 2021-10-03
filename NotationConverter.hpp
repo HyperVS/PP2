@@ -3,27 +3,26 @@
 #include "NotationConverterInterface.hpp"
 #include "Deque.hpp"
 #include<iostream>
-using namespace std;
 
-//Class for the notation converter
-//It is a friend of the Deque class
+
+//Class of the notation converter
 class NotationConverter : public NotationConverterInterface{
 public:
-    string postfixToInfix(string inStr);
-    string postfixToPrefix(string inStr);
+    std::string postfixToInfix(std::string inStr);
+    std::string postfixToPrefix(std::string inStr);
 
-    string infixToPostfix(string inStr);
-    string infixToPrefix(string inStr);
+    std::string infixToPostfix(std::string inStr);
+    std::string infixToPrefix(std::string inStr);
 
-    string prefixToInfix(string inStr);
-    string prefixToPostfix(string inStr);
+    std::string prefixToInfix(std::string inStr);
+    std::string prefixToPostfix(std::string inStr);
 
-    string toString();  //Converts the deque into a string
+    std::string toString();  
 
 private:
-    Deque N;    //The main deque
-    Deque temp; //A temp deque used in various functions
-    Deque temp2;//Another temp deque only used in the postfixToInfix function
+    Deque deque; // Main deck that will be used to convert between the notations
+    Deque operands; // Temporary deque to store operands when converting between notations
+    Deque operators; // Temporary deque to store operators when converting between notations
 };
 
 #endif
